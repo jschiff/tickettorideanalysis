@@ -6,9 +6,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class Board {
-  private final Map<String, City> cities = new HashMap<String, City>();
+public class Game {
+  private final Map<String, City> cityMap = new HashMap<String, City>();
+  private final Set<City> cities = new HashSet<City>();
   private final Set<Connection> connections = new HashSet<Connection>();
+  private final Set<Route> routes = new HashSet<Route>();
 
   public Connection addConnection(City a, City b, int weight,
       ConnectionColor connectionColor) {
@@ -23,16 +25,37 @@ public class Board {
     return connection;
   }
 
+  public Route addRoute(City a, City b, int reward) {
+    Set<City> cityKey = new HashSet<City>();
+    cityKey.add(a);
+    cityKey.add(b);
+    Route route = new Route(cityKey, reward);
+    routes.add(route);
+    a.addRoute(route);
+    b.addRoute(route);
+    return route;
+  }
+
   public City cityForName(String name) {
-    City city = cities.get(name);
+    City city = cityMap.get(name);
     if (city == null) {
-      city = cities.put(name, new City(name));
+      city = new City(name);
+      cityMap.put(name, city);
+      cities.add(city);
     }
 
     return city;
   }
 
+  public Set<City> getAllCities() {
+    return Collections.unmodifiableSet(cities);
+  }
+
   public Set<Connection> getAllConnections() {
     return Collections.unmodifiableSet(connections);
+  }
+
+  public Set<Route> getAllRoutes() {
+    return Collections.unmodifiableSet(routes);
   }
 }

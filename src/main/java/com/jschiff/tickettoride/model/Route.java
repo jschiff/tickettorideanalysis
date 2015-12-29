@@ -5,16 +5,15 @@ import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.Set;
 
-public class Connection {
+public class Route {
   private final Set<City> cities;
-  private final int weight;
+  private final int reward;
 
-  Connection(Set<City> cities, int weight, ConnectionColor color) {
-    Preconditions.checkNotNull(color);
+  Route(Set<City> cities, int reward) {
     Preconditions.checkNotNull(cities);
     Preconditions.checkArgument(cities.size() == 2);
 
-    this.weight = weight;
+    this.reward = reward;
     this.cities = Collections.unmodifiableSet(cities);
   }
 
@@ -22,7 +21,7 @@ public class Connection {
     return cities;
   }
 
-  public int getWeight() {
-    return weight;
+  public int getReward() {
+    return reward;
   }
 }

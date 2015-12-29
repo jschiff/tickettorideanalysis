@@ -12,6 +12,7 @@ import java.util.Set;
 public class City {
   private final Set<Connection> connections = new HashSet<Connection>();
   private final String name;
+  private final Set<Route> routes = new HashSet<Route>();
 
   City(String name) {
     Preconditions.checkNotNull(name);
@@ -40,6 +41,12 @@ public class City {
 
   City addConnection(Connection connection) {
     connections.add(connection);
+
+    return this;
+  }
+
+  City addRoute(Route route) {
+    routes.add(route);
 
     return this;
   }
