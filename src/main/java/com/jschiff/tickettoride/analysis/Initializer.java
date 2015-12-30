@@ -4,7 +4,7 @@ import com.jschiff.tickettoride.model.Game;
 import com.jschiff.tickettoride.model.ConnectionColor;
 
 public class Initializer {
-  public Game initializeBoard(Iterable<ConnectionData> connections, Iterable<RouteData> routes) {
+  public Game initializeGame(Iterable<ConnectionData> connections, Iterable<RouteData> routes) {
     Game game = new Game();
 
     for (ConnectionData data : connections) {

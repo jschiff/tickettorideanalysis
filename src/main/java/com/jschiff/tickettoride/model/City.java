@@ -2,7 +2,6 @@ package com.jschiff.tickettoride.model;
 
 import com.google.common.base.Preconditions;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,9 +9,9 @@ import java.util.Set;
  * Tools for working with cities. The static methods of this class are not thread safe.
  */
 public class City {
-  private final Set<Connection> connections = new HashSet<Connection>();
+  private final Set<Connection> connections = new HashSet<>();
   private final String name;
-  private final Set<Route> routes = new HashSet<Route>();
+  private final Set<Route> routes = new HashSet<>();
 
   City(String name) {
     Preconditions.checkNotNull(name);
@@ -31,7 +30,19 @@ public class City {
   }
 
   public Set<Connection> getConnections() {
-    return Collections.unmodifiableSet(connections);
+    return new HashSet<>(connections);
+  }
+
+  public Set<City> getNeighbors() {
+    Set<City> neighbors = new HashSet<>();
+
+    for (Connection connection : getConnections()) {
+      Set<City> cities = connection.getCities();
+      cities.remove(this);
+      neighbors.add(cities.iterator().next());
+    }
+
+    return neighbors;
   }
 
   @Override

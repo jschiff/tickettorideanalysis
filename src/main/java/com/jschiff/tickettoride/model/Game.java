@@ -7,14 +7,14 @@ import java.util.Map;
 import java.util.Set;
 
 public class Game {
-  private final Map<String, City> cityMap = new HashMap<String, City>();
-  private final Set<City> cities = new HashSet<City>();
-  private final Set<Connection> connections = new HashSet<Connection>();
-  private final Set<Route> routes = new HashSet<Route>();
+  private final Set<City> cities = new HashSet<>();
+  private final Map<String, City> cityMap = new HashMap<>();
+  private final Set<Connection> connections = new HashSet<>();
+  private final Set<Route> routes = new HashSet<>();
 
   public Connection addConnection(City a, City b, int weight,
       ConnectionColor connectionColor) {
-    Set<City> cityKey = new HashSet<City>();
+    Set<City> cityKey = new HashSet<>();
     cityKey.add(a);
     cityKey.add(b);
     Connection connection = new Connection(cityKey, weight, connectionColor);
@@ -26,7 +26,7 @@ public class Game {
   }
 
   public Route addRoute(City a, City b, int reward) {
-    Set<City> cityKey = new HashSet<City>();
+    Set<City> cityKey = new HashSet<>();
     cityKey.add(a);
     cityKey.add(b);
     Route route = new Route(cityKey, reward);
