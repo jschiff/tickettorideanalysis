@@ -12,7 +12,7 @@ public class Initializer {
           game.cityForName(data.getOriginCity()),
           game.cityForName(data.getDestinationCity()),
           data.getLength(),
-          ConnectionColor.valueOf(data.getColor()));
+          ConnectionColor.valueOf(data.getColor().toUpperCase()));
     }
 
     for (RouteData data : routes) {

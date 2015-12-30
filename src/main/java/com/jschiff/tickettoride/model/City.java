@@ -33,6 +33,16 @@ public class City {
     return new HashSet<>(connections);
   }
 
+  public int getNeighborDistance(City neighbor) {
+    for (Connection connection : getConnections()) {
+      if (connection.getCities().contains(neighbor)) {
+        return connection.getWeight();
+      }
+    }
+
+    throw new IllegalArgumentException(neighbor + " is not a neighbor of " + this);
+  }
+
   public Set<City> getNeighbors() {
     Set<City> neighbors = new HashSet<>();
 
@@ -48,6 +58,11 @@ public class City {
   @Override
   public int hashCode() {
     return name.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    return name;
   }
 
   City addConnection(Connection connection) {

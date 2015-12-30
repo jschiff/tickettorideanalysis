@@ -3,6 +3,7 @@ package com.jschiff.tickettoride.model;
 import com.google.common.base.Preconditions;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Connection {
@@ -19,10 +20,15 @@ public class Connection {
   }
 
   public Set<City> getCities() {
-    return cities;
+    return new HashSet<>(cities);
   }
 
   public int getWeight() {
     return weight;
+  }
+
+  @Override
+  public String toString() {
+    return cities.toString() + " - " + weight;
   }
 }

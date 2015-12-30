@@ -6,7 +6,7 @@ public enum ConnectionColor {
   YELLOW,
   GREEN,
   BLUE,
-  PURPLE,
+  PINK,
   BLACK,
   WHITE,
   GREY

@@ -5,6 +5,7 @@ import com.jschiff.tickettoride.model.Connection;
 import com.jschiff.tickettoride.model.Game;
 import com.jschiff.tickettoride.model.Route;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -55,7 +56,7 @@ public class Analyzer {
 
       for (City neighbor : closest.getNeighbors()) {
         int currentDistance = distances.get(neighbor);
-        int newDistance = distances.get(closest);
+        int newDistance = distances.get(closest) + closest.getNeighborDistance(neighbor);
         if (newDistance < currentDistance) {
           previousNodes.put(neighbor, closest);
           distances.put(neighbor, newDistance);
@@ -67,12 +68,14 @@ public class Analyzer {
     City c = destination;
     while (c != origin) {
       City previous = previousNodes.get(c);
+      final City finalC = c;
       Connection conn = previous.getConnections()
           .stream()
-          .filter(connection -> connection.getCities().contains(c))
+          .filter(connection -> connection.getCities().contains(finalC))
           .findAny()
           .get();
       path.addConnection(conn);
+      c = previous;
     }
 
     return path;

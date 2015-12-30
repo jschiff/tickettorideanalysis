@@ -33,4 +33,9 @@ public class Path {
   public int totalLength() {
     return connections.stream().mapToInt(Connection::getWeight).sum();
   }
+
+  @Override
+  public String toString() {
+    return connections.toString() + " " + totalLength();
+  }
 }

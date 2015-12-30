@@ -9,8 +9,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Iterator;
 
 public class AnalyzerMain {
@@ -77,23 +77,31 @@ public class AnalyzerMain {
 
   private static CSVFormat connectionFormat() {
     return CSVFormat.DEFAULT
-        .withHeader("Origin", "Destination", "Length", "Color")
+        .withHeader()
         .withRecordSeparator('\n')
         .withDelimiter(',');
   }
 
   public static void main(String[] args) throws ParseException, IOException {
     CommandLine cl = new DefaultParser().parse(options(), args);
-    String connectionFile = cl.getOptionValue("c", "connections.csv");
-    String routeFile = cl.getOptionValue("r", "routes.csv");
+    String connectionFile = cl.getOptionValue("c", "./connections.csv");
+    String routeFile = cl.getOptionValue("r", "./routes.csv");
 
-    CSVParser connectionParser = new CSVParser(new FileReader(connectionFile), connectionFormat());
-    CSVParser routeParser = new CSVParser(new FileReader(routeFile), routeFormat());
+    InputStreamReader connectionReader = new InputStreamReader(
+        AnalyzerMain.class.getClassLoader().getResourceAsStream(connectionFile));
+    InputStreamReader routeReader = new InputStreamReader(
+        AnalyzerMain.class.getClassLoader().getResourceAsStream(routeFile));
+    CSVParser connectionParser = new CSVParser(connectionReader, connectionFormat());
+    CSVParser routeParser = new CSVParser(routeReader, routeFormat());
 
     Game game = new Initializer().initializeGame(
         new ConnectionIterable(connectionParser),
         new RouteIterable(routeParser));
-    Analysis analyze = new Analyzer(game).analyze();
+    Analysis analysis = new Analyzer(game).analyze();
+    System.out.println("Maximum criticality: " + analysis.getCriticalities()
+        .entrySet()
+        .stream()
+        .max((entry1, entry2) -> entry1.getValue().compareTo(entry2.getValue())));
   }
 
   private static Options options() {
@@ -104,7 +112,7 @@ public class AnalyzerMain {
 
   private static CSVFormat routeFormat() {
     return CSVFormat.DEFAULT
-        .withHeader("Origin", "Destination", "Points")
+        .withHeader()
         .withRecordSeparator('\n')
         .withDelimiter(',');
   }

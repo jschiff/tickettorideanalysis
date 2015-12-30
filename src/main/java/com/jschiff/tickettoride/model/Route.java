@@ -24,4 +24,9 @@ public class Route {
   public int getReward() {
     return reward;
   }
+
+  @Override
+  public String toString() {
+    return cities.toString() + " " + reward;
+  }
 }
