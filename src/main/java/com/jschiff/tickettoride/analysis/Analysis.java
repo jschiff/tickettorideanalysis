@@ -6,10 +6,11 @@ import com.jschiff.tickettoride.model.Route;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Analysis {
   private final Map<Connection, Integer> criticalities = new HashMap<>();
-  private Map<Route, Path> shortestPaths;
+  private Map<Route, Set<Path>> shortestPaths;
 
   public void addCriticality(Connection connection) {
     Integer criticality = criticalities.getOrDefault(connection, 0);
@@ -20,11 +21,11 @@ public class Analysis {
     return Collections.unmodifiableMap(criticalities);
   }
 
-  public Map<Route, Path> getShortestPaths() {
+  public Map<Route, Set<Path>> getShortestPaths() {
     return shortestPaths;
   }
 
-  public void setShortestPaths(Map<Route, Path> shortestPaths) {
+  public void setShortestPaths(Map<Route, Set<Path>> shortestPaths) {
     this.shortestPaths = shortestPaths;
   }
 }

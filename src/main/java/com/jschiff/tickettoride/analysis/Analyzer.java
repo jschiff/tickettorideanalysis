@@ -1,11 +1,9 @@
 package com.jschiff.tickettoride.analysis;
 
 import com.jschiff.tickettoride.model.City;
-import com.jschiff.tickettoride.model.Connection;
 import com.jschiff.tickettoride.model.Game;
 import com.jschiff.tickettoride.model.Route;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,7 +19,7 @@ public class Analyzer {
 
   public Analysis analyze() {
     Set<Route> routes = game.getAllRoutes();
-    Map<Route, Path> shortestPaths = new HashMap<>();
+    Map<Route, Set<Path>> shortestPaths = new HashMap<>();
 
     for (Route route : routes) {
       shortestPaths.put(route, findShortestPath(route));
@@ -29,20 +27,21 @@ public class Analyzer {
 
     Analysis analysis = new Analysis();
     analysis.setShortestPaths(shortestPaths);
-    for (Path path : shortestPaths.values()) {
-      path.getConnections().forEach(analysis::addCriticality);
-    }
+    shortestPaths.values().forEach(set -> set.forEach(
+        path1 -> path1.getConnections().forEach(analysis::addCriticality)
+    ));
+
     return analysis;
   }
 
-  private Path findShortestPath(Route route) {
+  private Set<Path> findShortestPath(Route route) {
     Iterator<City> cities = route.getCities().iterator();
     City origin = cities.next();
     City destination = cities.next();
 
     HashSet<City> unvisited = new HashSet<>();
     final Map<City, Integer> distances = new HashMap<>();
-    Map<City, City> previousNodes = new HashMap<>();
+    Map<City, Set<City>> previousNodes = new HashMap<>();
     game.getAllCities().stream().forEach(city -> {
       distances.put(city, Integer.MAX_VALUE);
       unvisited.add(city);
@@ -57,27 +56,66 @@ public class Analyzer {
       for (City neighbor : closest.getNeighbors()) {
         int currentDistance = distances.get(neighbor);
         int newDistance = distances.get(closest) + closest.getNeighborDistance(neighbor);
+
         if (newDistance < currentDistance) {
-          previousNodes.put(neighbor, closest);
+          // If this is closer, the closest set now only contains this one city.
+          Set<City> previousCities = new HashSet<>();
+          previousCities.add(closest);
+          previousNodes.put(neighbor, previousCities);
           distances.put(neighbor, newDistance);
+        } else if (newDistance == currentDistance) {
+          // If this is the same as the current closest, add this city to that set.
+          Set<City> previousCities = previousNodes.getOrDefault(neighbor, new HashSet<>());
+          previousCities.add(closest);
+          previousNodes.put(neighbor, previousCities);
         }
       }
     }
 
-    Path path = new Path();
-    City c = destination;
-    while (c != origin) {
-      City previous = previousNodes.get(c);
-      final City finalC = c;
-      Connection conn = previous.getConnections()
+    final Set<Path> finishedPaths = new HashSet<>();
+    final Set<Path> unfinishedPaths = new HashSet<>();
+    Set<City> destinationPrevious = previousNodes.get(destination);
+    destinationPrevious.forEach(destPrevCity -> {
+      // Create a path for each
+      Path path = new Path(destination, destPrevCity.getConnections()
           .stream()
-          .filter(connection -> connection.getCities().contains(finalC))
+          .filter(connection -> connection.getCities().contains(destPrevCity))
           .findAny()
-          .get();
-      path.addConnection(conn);
-      c = previous;
+          .get());
+      if (path.getDestination().equals(origin)) {
+        finishedPaths.add(path);
+      } else {
+        unfinishedPaths.add(path);
+      }
+    });
+
+    while (!unfinishedPaths.isEmpty()) {
+      Set<Path> pathsToAdd = new HashSet<>();
+      unfinishedPaths.forEach(unfinishedPath -> {
+        City dest = unfinishedPath.getDestination();
+        Set<City> cities1 = previousNodes.get(dest);
+        cities1.forEach(city -> {
+          Path newPath = unfinishedPath.copy();
+          newPath.addConnection(
+              dest.getConnections()
+                  .stream()
+                  .filter(conn -> conn.getCities().contains(city))
+                  .findFirst()
+                  .get());
+          pathsToAdd.add(newPath);
+        });
+      });
+
+      unfinishedPaths.clear();
+      pathsToAdd.forEach(path1 -> {
+        if (path1.getDestination().equals(origin)) {
+          finishedPaths.add(path1);
+        } else {
+          unfinishedPaths.add(path1);
+        }
+      });
     }
 
-    return path;
+    return finishedPaths;
   }
 }
